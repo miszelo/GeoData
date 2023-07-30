@@ -1,4 +1,4 @@
-package com.example.geodata.esaoseapi;
+package com.example.geodata.esaose.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -18,13 +18,4 @@ public class SmogData {
 
     @JsonFormat(pattern = "yyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
-
-    @Override
-    public String toString() {
-        return "SmogData{" +
-                "school=" + school +
-                ", data=" + data +
-                ", timestamp=" + timestamp +
-                '}';
-    }
 }
