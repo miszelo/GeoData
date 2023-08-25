@@ -1,25 +1,25 @@
 package com.example.geodata.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "coordinates")
+@AllArgsConstructor
 public class Coordinates {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "coordinates_id", nullable = false)
     private Long coordinatesId;
 
-    private Double longitude;
-    private Double latitude;
+    @OneToOne(mappedBy = "coordinates")
+    private Place place;
 
+    private double longitude;
+    private double latitude;
 }

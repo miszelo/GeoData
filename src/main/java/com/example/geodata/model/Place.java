@@ -1,27 +1,31 @@
 package com.example.geodata.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "place")
 public class Place {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "place_id", nullable = false)
     private Long placeId;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "coordinates_id")
     private Coordinates coordinates;
+
+    @OneToMany(mappedBy = "place")
+    private List<GeoData> geoDataList = new ArrayList<>();
 
     private String name;
     private String city;
