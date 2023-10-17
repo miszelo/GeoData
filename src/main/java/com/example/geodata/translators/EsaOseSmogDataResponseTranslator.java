@@ -7,6 +7,8 @@ import com.example.geodata.model.GeoData;
 import com.example.geodata.model.Place;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class EsaOseSmogDataResponseTranslator implements ResponseTranslator<SmogData, GeoData> {
 
@@ -16,11 +18,11 @@ public class EsaOseSmogDataResponseTranslator implements ResponseTranslator<Smog
         var schoolData = smogData.getSchool();
         return GeoData.builder()
                 .place(getPlace(schoolData))
-                .humidity(data.getHumidityAverage())
-                .pressure(data.getPressureAverage())
-                .temperature(data.getTemperatureAverage())
-                .pm10(data.getPm10Average())
-                .pm25(data.getPm25Average())
+                .humidity(BigDecimal.valueOf(data.getHumidityAverage()))
+                .pressure(BigDecimal.valueOf(data.getPressureAverage()))
+                .temperature(BigDecimal.valueOf(data.getTemperatureAverage()))
+                .pm10(BigDecimal.valueOf(data.getPm10Average()))
+                .pm25(BigDecimal.valueOf(data.getPm25Average()))
                 .timestamp(smogData.getTimestamp())
                 .build();
     }
