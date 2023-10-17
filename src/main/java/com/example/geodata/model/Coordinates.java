@@ -7,8 +7,8 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@RequiredArgsConstructor
 @Table(name = "coordinates")
+@NoArgsConstructor
 @AllArgsConstructor
 public class Coordinates {
 
