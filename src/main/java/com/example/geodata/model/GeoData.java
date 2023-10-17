@@ -1,6 +1,5 @@
 package com.example.geodata.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,9 +19,8 @@ public class GeoData {
     @Column(name = "data_id", nullable = false)
     private Long dataId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
-    @JsonIgnore
     private Place place;
 
     private LocalDateTime timestamp;
