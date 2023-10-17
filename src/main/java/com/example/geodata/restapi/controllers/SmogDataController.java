@@ -29,7 +29,7 @@ public class SmogDataController {
 
     @GetMapping(value = "/smog-data")
     public ResponseEntity<?> getCurrentDataFromDatabase() {
-        var geoData = smogDataService.getGeoData();
+        var geoData = smogDataService.getCurrentGeoData();
         return new ResponseEntity<>(geoData, HttpStatus.OK);
     }
 }
