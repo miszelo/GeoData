@@ -24,7 +24,7 @@ public class Place {
     @JoinColumn(name = "coordinates_id")
     private Coordinates coordinates;
 
-    @OneToMany(mappedBy = "place")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GeoData> geoDataList = new ArrayList<>();
 
     private String name;

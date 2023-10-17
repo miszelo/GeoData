@@ -1,5 +1,6 @@
 package com.example.geodata.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,17 +22,18 @@ public class GeoData {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "place_id")
+    @JsonIgnore
     private Place place;
 
     private LocalDateTime timestamp;
-    @Column(scale = 3)
+    @Column(scale = 4)
     private BigDecimal humidity;
-    @Column(scale = 3)
+    @Column(scale = 4)
     private BigDecimal pressure;
-    @Column(scale = 3)
+    @Column(scale = 4)
     private BigDecimal temperature;
-    @Column(scale = 3)
+    @Column(scale = 4)
     private BigDecimal pm10;
-    @Column(scale = 3)
+    @Column(scale = 2)
     private BigDecimal pm25;
 }
