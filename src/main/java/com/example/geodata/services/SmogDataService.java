@@ -8,6 +8,9 @@ import com.example.geodata.repository.PlaceRepository;
 import com.example.geodata.translators.EsaOseSmogDataResponseTranslator;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -21,7 +24,8 @@ public class SmogDataService {
 
     public SmogDataService(EsaOseSmogDataResponseTranslator esaOseSmogDataResponseTranslator,
                            EsaOseDataRetriever esaOseDataRetriever,
-                           GeoDataRepository geoDataRepository, PlaceRepository placeRepository,
+                           GeoDataRepository geoDataRepository,
+                           PlaceRepository placeRepository,
                            CoordinatesRepository coordinatesRepository) {
         this.esaOseSmogDataResponseTranslator = esaOseSmogDataResponseTranslator;
         this.esaOseDataRetriever = esaOseDataRetriever;
@@ -30,31 +34,32 @@ public class SmogDataService {
         this.coordinatesRepository = coordinatesRepository;
     }
 
-    public List<GeoData> getGeoData() {
+    public List<GeoData> saveData() {
         var esaOseData = esaOseDataRetriever.getEsaOseData();
         var geoData = esaOseData.getSmogDataList().stream()
                 .map(esaOseSmogDataResponseTranslator::translate)
                 .toList();
         if (geoDataRepository.findFirstByTimestamp(geoData.get(0).getTimestamp()).isPresent()) {
-            System.out.println("juz takie dane sa");
-            return List.of();
+            return Collections.emptyList();
         }
-        geoData.forEach(this::saveGeoDataToDatabase);
+        for (var data : geoData) {
+            var place = data.getPlace();
+            var coordinates = place.getCoordinates();
+            var existingCoordinates = coordinatesRepository.findFirstByLongitudeAndLatitude(
+                    coordinates.getLongitude(),
+                    coordinates.getLatitude());
+            var existingPlace = placeRepository.findFirstByCoordinates(existingCoordinates.orElse(null));
+            if (existingPlace.isPresent() && existingCoordinates.isPresent()) {
+                data.setPlace(existingPlace.get());
+            }
+        }
+        geoDataRepository.saveAll(geoData);
         return geoData;
     }
 
-    private void saveGeoDataToDatabase(GeoData geoData) {
-        var existingCoordinates = coordinatesRepository.findFirstByLongitudeAndLatitude(
-                geoData.getPlace().getCoordinates().getLongitude(),
-                geoData.getPlace().getCoordinates().getLatitude());
-        var existingPlace = placeRepository.findFirstByNameAndCityAndStreetAndPostalCode(
-                geoData.getPlace().getName(),
-                geoData.getPlace().getCity(),
-                geoData.getPlace().getStreet(),
-                geoData.getPlace().getPostalCode());
-        if (existingPlace.isPresent() && existingCoordinates.isPresent()) {
-            geoData.setPlace(existingPlace.get());
-        }
-        geoDataRepository.save(geoData);
+    public List<GeoData> getGeoData() {
+        return geoDataRepository.findAllByTimestampAfter(
+                        LocalDateTime.now().truncatedTo(ChronoUnit.DAYS))
+                .orElse(Collections.emptyList());
     }
 }
