@@ -2,6 +2,7 @@ package com.example.geodata.translators;
 
 import com.example.geodata.esaose.model.School;
 import com.example.geodata.esaose.model.SmogData;
+import com.example.geodata.model.City;
 import com.example.geodata.model.Coordinates;
 import com.example.geodata.model.GeoData;
 import com.example.geodata.model.Place;
@@ -30,10 +31,16 @@ public class EsaOseSmogDataResponseTranslator implements ResponseTranslator<Smog
     private Place getPlace(School schoolData) {
         return Place.builder()
                 .name(schoolData.getName())
-                .city(schoolData.getCity())
+                .city(getCity(schoolData))
                 .street(schoolData.getStreet())
                 .postalCode(schoolData.getPostalCode())
                 .coordinates(getCoordinates(schoolData))
+                .build();
+    }
+
+    private City getCity(School schoolData) {
+        return City.builder()
+                .name(schoolData.getCity())
                 .build();
     }
 
