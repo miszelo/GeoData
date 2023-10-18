@@ -3,7 +3,6 @@ package com.example.geodata.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,6 +21,6 @@ public class City {
 
     private String name;
 
-    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Place> placeList = new ArrayList<>();
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL)
+    private List<Place> placeList;
 }

@@ -19,19 +19,19 @@ public class GeoData {
     @Column(name = "data_id", nullable = false)
     private Long dataId;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "place_id")
     private Place place;
 
     private LocalDateTime timestamp;
-    @Column(scale = 4)
+    @Column(scale = 2, precision = 6)
     private BigDecimal humidity;
-    @Column(scale = 4)
+    @Column(scale = 2, precision = 7)
     private BigDecimal pressure;
-    @Column(scale = 4)
+    @Column(scale = 2, precision = 6)
     private BigDecimal temperature;
-    @Column(scale = 4)
+    @Column(scale = 2, precision = 6)
     private BigDecimal pm10;
-    @Column(scale = 2)
+    @Column(scale = 2, precision = 6)
     private BigDecimal pm25;
 }
