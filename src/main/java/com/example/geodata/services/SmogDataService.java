@@ -7,7 +7,6 @@ import com.example.geodata.repository.GeoDataRepository;
 import com.example.geodata.repository.PlaceRepository;
 import com.example.geodata.restapi.dto.GeoDataDTO;
 import com.example.geodata.translators.EsaOseSmogDataResponseTranslator;
-import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +16,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.example.geodata.restapi.mappers.GeoDataMapper.mapGeoDataToGeoDataDTO;
 
 @Service
 public class SmogDataService {
-
     private final EsaOseSmogDataResponseTranslator esaOseSmogDataResponseTranslator;
     private final EsaOseDataRetriever esaOseDataRetriever;
     private final GeoDataRepository geoDataRepository;
@@ -38,7 +38,7 @@ public class SmogDataService {
         this.placeRepository = placeRepository;
     }
 
-    @Transactional
+    //    @Transactional
     public List<GeoDataDTO> saveData() {
         var esaOseData = esaOseDataRetriever.getEsaOseData();
         var geoData = esaOseData.getSmogDataList().stream()
@@ -48,10 +48,15 @@ public class SmogDataService {
             return Collections.emptyList();
         }
 
-        filterExistingRecords(geoData);
-
-        geoDataRepository.saveAll(geoData);
-
+        try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+            filterExistingRecords(geoData);
+            for (int i = 0; i < geoData.size(); i++) {
+                int finalI = i;
+                executorService.submit(() -> {
+                    geoDataRepository.save(geoData.get(finalI));
+                });
+            }
+        }
         return mapGeoDataToGeoDataDTO(geoData);
     }
 
@@ -59,8 +64,7 @@ public class SmogDataService {
         List<Place> places = placeRepository.findAll();
 
         Map<String, Place> placesMap = new HashMap<>();
-        places.forEach(place ->
-                placesMap.put(place.getCoordinates().getLatitude() + "," + place.getCoordinates().getLongitude(), place));
+        places.forEach(place -> placesMap.put(place.getCoordinates().getLatitude() + "," + place.getCoordinates().getLongitude(), place));
 
         geoData.forEach(data -> {
             String key = data.getPlace().getCoordinates().getLatitude() + "," + data.getPlace().getCoordinates().getLongitude();
@@ -78,4 +82,7 @@ public class SmogDataService {
         return mapGeoDataToGeoDataDTO(a);
     }
 
+    public void deleteData(LocalDateTime localDateTime) {
+        geoDataRepository.deleteAllByTimestamp(localDateTime);
+    }
 }
