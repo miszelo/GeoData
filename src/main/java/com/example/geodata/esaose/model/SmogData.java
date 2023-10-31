@@ -16,6 +16,6 @@ public class SmogData {
 
     private Data data;
 
-    @JsonFormat(pattern = "yyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 }
