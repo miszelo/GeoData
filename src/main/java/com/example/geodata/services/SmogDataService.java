@@ -6,10 +6,13 @@ import com.example.geodata.model.Place;
 import com.example.geodata.repository.GeoDataRepository;
 import com.example.geodata.repository.PlaceRepository;
 import com.example.geodata.restapi.dto.GeoDataDTO;
+import com.example.geodata.restapi.dto.RequestRetrieveDataByLocalDateDto;
 import com.example.geodata.translators.EsaOseSmogDataResponseTranslator;
+import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -38,7 +41,7 @@ public class SmogDataService {
         this.placeRepository = placeRepository;
     }
 
-    //    @Transactional
+    @Transactional
     public List<GeoDataDTO> saveData() {
         var esaOseData = esaOseDataRetriever.getEsaOseData();
         var geoData = esaOseData.getSmogDataList().stream()
@@ -78,11 +81,24 @@ public class SmogDataService {
     @Cacheable("currentGeoData")
     public List<GeoDataDTO> getCurrentGeoData() {
         var a = geoDataRepository.findAllByTimestampAfter(
-                LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
+                        LocalDateTime.now().truncatedTo(ChronoUnit.DAYS))
+                .orElseThrow();
         return mapGeoDataToGeoDataDTO(a);
     }
 
     public void deleteData(LocalDateTime localDateTime) {
         geoDataRepository.deleteAllByTimestamp(localDateTime);
+    }
+
+    public List<GeoDataDTO> getGeoDataByTimestamp(RequestRetrieveDataByLocalDateDto timestamp) {
+        Timestamp sqlTimestamp = Timestamp.valueOf(timestamp.timestamp().atStartOfDay());
+        var geoData = geoDataRepository.findAllByTimestamp(sqlTimestamp);
+        return mapGeoDataToGeoDataDTO(geoData);
+    }
+
+    public List<GeoData> getGeoDataBySchoolNameAndTimestamp(String schoolName, LocalDateTime timestamp) {
+        var geoData = geoDataRepository.findAllBySchoolNameAndTimestamp(schoolName, timestamp)
+                .orElseThrow();
+        return geoData;
     }
 }
