@@ -1,6 +1,7 @@
 package com.example.geodata.services;
 
 import com.example.geodata.esaose.EsaOseDataRetriever;
+import com.example.geodata.model.Coordinates;
 import com.example.geodata.model.GeoData;
 import com.example.geodata.model.Place;
 import com.example.geodata.repository.GeoDataRepository;
@@ -15,12 +16,10 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 
 import static com.example.geodata.restapi.mappers.GeoDataMapper.mapGeoDataToGeoDataDTO;
 
@@ -44,8 +43,10 @@ public class SmogDataService {
     @Transactional
     public List<GeoDataDTO> saveData() {
         var esaOseData = esaOseDataRetriever.getEsaOseData();
+        var geoDataSet = new HashSet<Coordinates>();
         var geoData = esaOseData.getSmogDataList().stream()
                 .map(esaOseSmogDataResponseTranslator::translate)
+                .filter(filterRepeatedValues(geoDataSet))
                 .toList();
         if (geoDataRepository.findFirstByTimestamp(geoData.get(0).getTimestamp()).isPresent()) {
             return Collections.emptyList();
@@ -63,20 +64,6 @@ public class SmogDataService {
         return mapGeoDataToGeoDataDTO(geoData);
     }
 
-    private void filterExistingRecords(List<GeoData> geoData) {
-        List<Place> places = placeRepository.findAll();
-
-        Map<String, Place> placesMap = new HashMap<>();
-        places.forEach(place -> placesMap.put(place.getCoordinates().getLatitude() + "," + place.getCoordinates().getLongitude(), place));
-
-        geoData.forEach(data -> {
-            String key = data.getPlace().getCoordinates().getLatitude() + "," + data.getPlace().getCoordinates().getLongitude();
-            Place place = placesMap.get(key);
-            if (place != null) {
-                data.setPlace(place);
-            }
-        });
-    }
 
     @Cacheable("currentGeoData")
     public List<GeoDataDTO> getCurrentGeoData() {
@@ -100,5 +87,28 @@ public class SmogDataService {
         var geoData = geoDataRepository.findAllBySchoolNameAndTimestamp(schoolName, timestamp)
                 .orElseThrow();
         return geoData;
+    }
+
+    private Predicate<GeoData> filterRepeatedValues(HashSet<Coordinates> geoDataSet) {
+        return smogData -> {
+            Coordinates coordinates = smogData.getPlace().getCoordinates();
+            boolean isDuplicate = !geoDataSet.add(coordinates);
+            return !isDuplicate;
+        };
+    }
+
+    private void filterExistingRecords(List<GeoData> geoData) {
+        List<Place> places = placeRepository.findAll();
+
+        Map<String, Place> placesMap = new HashMap<>();
+        places.forEach(place -> placesMap.put(place.getCoordinates().getLatitude() + "," + place.getCoordinates().getLongitude(), place));
+
+        geoData.forEach(data -> {
+            String key = data.getPlace().getCoordinates().getLatitude() + "," + data.getPlace().getCoordinates().getLongitude();
+            Place place = placesMap.get(key);
+            if (place != null) {
+                data.setPlace(place);
+            }
+        });
     }
 }
