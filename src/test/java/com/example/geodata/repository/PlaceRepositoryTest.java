@@ -3,15 +3,16 @@ package com.example.geodata.repository;
 import com.example.geodata.model.City;
 import com.example.geodata.model.Coordinates;
 import com.example.geodata.model.Place;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 
-import static com.example.geodata.repository.RepositoryUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.example.geodata.utils.RepositoryUtils.*;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
