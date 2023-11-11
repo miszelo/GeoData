@@ -10,7 +10,7 @@ import org.springframework.core.task.support.TaskExecutorAdapter;
 import java.util.concurrent.Executors;
 
 @Configuration
-public class ApplicationConfiguration {
+public class VirtualThreadConfiguration {
 
     @Bean(TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME)
     public AsyncTaskExecutor applicationTaskExecutor() {
@@ -21,5 +21,4 @@ public class ApplicationConfiguration {
     public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
         return protocolHandler -> protocolHandler.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
     }
-
 }

@@ -7,13 +7,13 @@ import com.example.geodata.model.Place;
 import com.example.geodata.repository.GeoDataRepository;
 import com.example.geodata.repository.PlaceRepository;
 import com.example.geodata.restapi.dto.GeoDataDTO;
-import com.example.geodata.restapi.dto.RequestRetrieveDataByLocalDateDto;
 import com.example.geodata.translators.EsaOseSmogDataResponseTranslator;
-import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -67,26 +67,39 @@ public class SmogDataService {
 
     @Cacheable("currentGeoData")
     public List<GeoDataDTO> getCurrentGeoData() {
-        var a = geoDataRepository.findAllByTimestampAfter(
-                        LocalDateTime.now().truncatedTo(ChronoUnit.DAYS))
-                .orElseThrow();
-        return mapGeoDataToGeoDataDTO(a);
+        var esaOseData = esaOseDataRetriever.getEsaOseData();
+        var geoDataSet = new HashSet<Coordinates>();
+        var geoData = esaOseData.getSmogDataList().stream()
+                .map(esaOseSmogDataResponseTranslator::translate)
+                .filter(filterRepeatedValues(geoDataSet))
+                .toList();
+        return mapGeoDataToGeoDataDTO(geoData);
     }
 
-    public void deleteData(LocalDateTime localDateTime) {
-        geoDataRepository.deleteAllByTimestamp(localDateTime);
-    }
 
-    public List<GeoDataDTO> getGeoDataByTimestamp(RequestRetrieveDataByLocalDateDto timestamp) {
-        Timestamp sqlTimestamp = Timestamp.valueOf(timestamp.timestamp().atStartOfDay());
+    public List<GeoDataDTO> getGeoDataByTimestamp(LocalDateTime timestamp) {
+        Timestamp sqlTimestamp = Timestamp.valueOf(LocalDate.from(timestamp).atStartOfDay());
         var geoData = geoDataRepository.findAllByTimestamp(sqlTimestamp);
         return mapGeoDataToGeoDataDTO(geoData);
     }
 
-    public List<GeoData> getGeoDataBySchoolNameAndTimestamp(String schoolName, LocalDateTime timestamp) {
-        var geoData = geoDataRepository.findAllBySchoolNameAndTimestamp(schoolName, timestamp)
+    public List<GeoDataDTO> getGeoDataBySchoolNameAndTimestamp(String schoolName, LocalDateTime timestamp) {
+        Timestamp sqlTimestamp = Timestamp.valueOf(LocalDate.from(timestamp.truncatedTo(ChronoUnit.DAYS)).atStartOfDay());
+        var geoData = geoDataRepository.findAllBySchoolNameAndTimestamp(schoolName, sqlTimestamp)
                 .orElseThrow();
-        return geoData;
+        return mapGeoDataToGeoDataDTO(geoData);
+    }
+
+    public List<GeoDataDTO> getGeoDataByCityAndTimeStamp(String city, LocalDateTime timestamp) {
+        Timestamp sqlTimestamp = Timestamp.valueOf(LocalDate.from(timestamp.truncatedTo(ChronoUnit.DAYS)).atStartOfDay());
+        var geoData = geoDataRepository.findAllByCityAndTimestamp(city, sqlTimestamp)
+                .orElseThrow();
+        return mapGeoDataToGeoDataDTO(geoData);
+    }
+
+    @Transactional
+    public void deleteData(LocalDateTime timestamp) {
+        geoDataRepository.deleteAllByTimestamp(Timestamp.valueOf(timestamp.truncatedTo(ChronoUnit.DAYS)));
     }
 
     private Predicate<GeoData> filterRepeatedValues(HashSet<Coordinates> geoDataSet) {
@@ -111,4 +124,5 @@ public class SmogDataService {
             }
         });
     }
+
 }
