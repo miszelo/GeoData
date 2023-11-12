@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,29 +75,24 @@ public class SmogDataService {
     }
 
 
-    public List<GeoDataDTO> getGeoDataByTimestamp(LocalDateTime timestamp) {
-        Timestamp sqlTimestamp = Timestamp.valueOf(LocalDate.from(timestamp).atStartOfDay());
+    public List<GeoDataDTO> getGeoDataByDay(LocalDate localDate) {
+        Timestamp sqlTimestamp = Timestamp.valueOf(localDate.atStartOfDay());
         var geoData = geoDataRepository.findAllByTimestamp(sqlTimestamp);
         return mapGeoDataToGeoDataDTO(geoData);
     }
 
-    public List<GeoDataDTO> getGeoDataBySchoolNameAndTimestamp(String schoolName, LocalDateTime timestamp) {
-        Timestamp sqlTimestamp = Timestamp.valueOf(LocalDate.from(timestamp.truncatedTo(ChronoUnit.DAYS)).atStartOfDay());
+    public List<GeoDataDTO> getGeoDataBySchoolNameAndDate(String schoolName, LocalDate localDate) {
+        Timestamp sqlTimestamp = Timestamp.valueOf(localDate.atStartOfDay());
         var geoData = geoDataRepository.findAllBySchoolNameAndTimestamp(schoolName, sqlTimestamp)
                 .orElseThrow();
         return mapGeoDataToGeoDataDTO(geoData);
     }
 
-    public List<GeoDataDTO> getGeoDataByCityAndTimeStamp(String city, LocalDateTime timestamp) {
-        Timestamp sqlTimestamp = Timestamp.valueOf(LocalDate.from(timestamp.truncatedTo(ChronoUnit.DAYS)).atStartOfDay());
+    public List<GeoDataDTO> getGeoDataByCityAndDate(String city, LocalDate localDate) {
+        Timestamp sqlTimestamp = Timestamp.valueOf(localDate.atStartOfDay());
         var geoData = geoDataRepository.findAllByCityAndTimestamp(city, sqlTimestamp)
                 .orElseThrow();
         return mapGeoDataToGeoDataDTO(geoData);
-    }
-
-    @Transactional
-    public void deleteData(LocalDateTime timestamp) {
-        geoDataRepository.deleteAllByTimestamp(Timestamp.valueOf(timestamp.truncatedTo(ChronoUnit.DAYS)));
     }
 
     private Predicate<GeoData> filterRepeatedValues(HashSet<Coordinates> geoDataSet) {

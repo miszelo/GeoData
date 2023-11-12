@@ -2,7 +2,6 @@ package com.example.geodata.repository;
 
 import com.example.geodata.model.GeoData;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -15,10 +14,6 @@ import java.util.Optional;
 public interface GeoDataRepository extends JpaRepository<GeoData, Long> {
 
     Optional<GeoData> findFirstByTimestamp(LocalDateTime timestamp);
-
-    @Modifying
-    @Query("DELETE FROM GeoData g WHERE DATE(g.timestamp) = ?1")
-    void deleteAllByTimestamp(Timestamp timestamp);
 
     @Query("SELECT g FROM GeoData g" +
             " JOIN FETCH g.place" +
