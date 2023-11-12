@@ -75,12 +75,14 @@ public class SmogDataService {
     }
 
 
+    @Cacheable("geoDataByDay")
     public List<GeoDataDTO> getGeoDataByDay(LocalDate localDate) {
         Timestamp sqlTimestamp = Timestamp.valueOf(localDate.atStartOfDay());
         var geoData = geoDataRepository.findAllByTimestamp(sqlTimestamp);
         return mapGeoDataToGeoDataDTO(geoData);
     }
 
+    @Cacheable("geoDataBySchoolNameAndDate")
     public List<GeoDataDTO> getGeoDataBySchoolNameAndDate(String schoolName, LocalDate localDate) {
         Timestamp sqlTimestamp = Timestamp.valueOf(localDate.atStartOfDay());
         var geoData = geoDataRepository.findAllBySchoolNameAndTimestamp(schoolName, sqlTimestamp)
@@ -88,6 +90,7 @@ public class SmogDataService {
         return mapGeoDataToGeoDataDTO(geoData);
     }
 
+    @Cacheable("geoDataByCityAndDate")
     public List<GeoDataDTO> getGeoDataByCityAndDate(String city, LocalDate localDate) {
         Timestamp sqlTimestamp = Timestamp.valueOf(localDate.atStartOfDay());
         var geoData = geoDataRepository.findAllByCityAndTimestamp(city, sqlTimestamp)
