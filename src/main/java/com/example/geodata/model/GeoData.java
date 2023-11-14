@@ -19,7 +19,7 @@ public class GeoData {
     @Column(name = "data_id", nullable = false)
     private Long dataId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "place_id")
     private Place place;
 
