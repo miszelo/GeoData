@@ -9,6 +9,7 @@ import com.example.geodata.model.Place;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 
 @Component
 public class EsaOseSmogDataResponseTranslator implements ResponseTranslator<SmogData, GeoData> {
@@ -24,7 +25,7 @@ public class EsaOseSmogDataResponseTranslator implements ResponseTranslator<Smog
                 .temperature(BigDecimal.valueOf(data.getTemperatureAverage()))
                 .pm10(BigDecimal.valueOf(data.getPm10Average()))
                 .pm25(BigDecimal.valueOf(data.getPm25Average()))
-                .timestamp(smogData.getTimestamp())
+                .timestamp(smogData.getTimestamp().truncatedTo(ChronoUnit.MINUTES))
                 .build();
     }
 
