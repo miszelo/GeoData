@@ -19,6 +19,7 @@ import static com.example.geodata.restapi.ApiConst.API_VERSION;
 @Tag(name = "Smog Data Controller", description = "Smog Data API")
 @RestController
 @RequestMapping(API + "/" + API_VERSION + "/smog-data")
+@CrossOrigin
 public class SmogDataController {
 
     private final SmogDataService smogDataService;
@@ -72,9 +73,9 @@ public class SmogDataController {
 
     @Operation(summary = "Save smog data")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<GeoDataDTO>> saveGeoData() {
-        var geoData = smogDataService.saveData();
-        return new ResponseEntity<>(geoData, HttpStatus.CREATED);
+    public ResponseEntity<?> saveGeoData() {
+        smogDataService.saveData();
+        return new ResponseEntity<>("Data saved", HttpStatus.CREATED);
     }
 
 }

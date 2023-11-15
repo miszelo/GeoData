@@ -3,8 +3,6 @@ package com.example.geodata.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
@@ -20,7 +18,4 @@ public class City {
     private Long cityId;
 
     private String name;
-
-    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL)
-    private List<Place> placeList;
 }

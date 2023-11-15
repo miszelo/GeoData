@@ -19,9 +19,6 @@ public class Coordinates {
     @Column(name = "coordinates_id", nullable = false)
     private Long coordinatesId;
 
-    @OneToOne(mappedBy = "coordinates", cascade = CascadeType.ALL)
-    private Place place;
-
     private double longitude;
     private double latitude;
 

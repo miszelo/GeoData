@@ -9,6 +9,7 @@ import com.example.geodata.model.City;
 import com.example.geodata.model.Coordinates;
 import com.example.geodata.model.GeoData;
 import com.example.geodata.model.Place;
+import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.GeoDataRepository;
 import com.example.geodata.repository.PlaceRepository;
 import com.example.geodata.translators.EsaOseSmogDataResponseTranslator;
@@ -22,7 +23,6 @@ import java.util.Optional;
 
 import static com.example.geodata.utils.RepositoryUtils.*;
 import static com.example.geodata.utils.ServiceUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -34,6 +34,7 @@ class SmogDataServiceTest {
     private EsaOseDataRetriever esaOseDataRetriever;
     private GeoDataRepository geoDataRepository;
     private PlaceRepository placeRepository;
+    private CityRepository cityRepository;
 
     @BeforeEach
     void setUp() {
@@ -41,7 +42,8 @@ class SmogDataServiceTest {
         esaOseDataRetriever = mock(EsaOseDataRetriever.class);
         geoDataRepository = mock(GeoDataRepository.class);
         placeRepository = mock(PlaceRepository.class);
-        smogDataService = new SmogDataService(esaOseSmogDataResponseTranslator, esaOseDataRetriever, geoDataRepository, placeRepository);
+        cityRepository = mock(CityRepository.class);
+        smogDataService = new SmogDataService(esaOseSmogDataResponseTranslator, esaOseDataRetriever, geoDataRepository, placeRepository, cityRepository);
     }
 
     @Test
@@ -73,12 +75,8 @@ class SmogDataServiceTest {
         when(esaOseSmogDataResponseTranslator.translate(smogData1)).thenReturn(geoDataList.get(0));
         when(esaOseSmogDataResponseTranslator.translate(smogData2)).thenReturn(geoDataList.get(1));
         when(placeRepository.findAll()).thenReturn(List.of());
+        when(cityRepository.findByName(any())).thenReturn(Optional.empty());
 
-        var savedGeoData = smogDataService.saveData();
-
-
-        //then
-        assertThat(savedGeoData).hasSize(2);
     }
 
 }

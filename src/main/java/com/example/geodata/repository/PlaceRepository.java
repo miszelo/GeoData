@@ -7,6 +7,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PlaceRepository extends JpaRepository<Place, Long> {
@@ -17,4 +18,6 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             " JOIN FETCH p.city" +
             " JOIN FETCH p.coordinates")
     List<Place> findAll();
+
+    Optional<Place> findByName(String name);
 }
