@@ -12,12 +12,12 @@ public class GeoDataMapper {
         return a.stream()
                 .map(geoData -> GeoDataDTO.builder()
                         .place(mapPlaceToPlaceDTO(geoData.getPlace()))
-                        .timestamp(geoData.getTimestamp().toString())
+                        .pm10(geoData.getPm10())
+                        .pm25(geoData.getPm25())
                         .humidity(geoData.getHumidity())
                         .pressure(geoData.getPressure())
                         .temperature(geoData.getTemperature())
-                        .pm10(geoData.getPm10())
-                        .pm25(geoData.getPm25())
+                        .timestamp(geoData.getTimestamp().toString())
                         .build()).toList();
     }
 }
