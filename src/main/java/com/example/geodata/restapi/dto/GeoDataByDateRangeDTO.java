@@ -2,12 +2,13 @@ package com.example.geodata.restapi.dto;
 
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 public class GeoDataByDateRangeDTO {
 
-    private final LocalDateTime timestamp;
+    private final LocalDate timestamp;
     private final PlaceDTO place;
     private final Double humidity;
     private final Double pressure;
@@ -28,7 +29,7 @@ public class GeoDataByDateRangeDTO {
                                  Double temperature,
                                  Double pm10,
                                  Double pm25) {
-        this.timestamp = timestamp;
+        this.timestamp = LocalDate.from(timestamp);
         this.place = PlaceDTO.builder()
                 .city(city)
                 .street(street)
