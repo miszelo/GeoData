@@ -1,5 +1,6 @@
 package com.example.geodata.restapi.controllers;
 
+import com.example.geodata.restapi.dto.GeoDataByDateRangeDTO;
 import com.example.geodata.restapi.dto.GeoDataDTO;
 import com.example.geodata.services.SmogDataService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import static com.example.geodata.restapi.ApiConst.API;
@@ -45,6 +48,7 @@ public class SmogDataController {
         return ResponseEntity.ok(geoData);
     }
 
+
     @Operation(summary = "Get smog data by city and date")
     @GetMapping(value = "/city/{city}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -58,6 +62,20 @@ public class SmogDataController {
         return ResponseEntity.ok(geoData);
     }
 
+    @Operation(summary = "Get smog data by city and date range")
+    @GetMapping(value = "/city/{city}/date-range",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<GeoDataByDateRangeDTO>> getGeoDataByCityAndDateRange(
+            @PathVariable String city,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        var geoData = smogDataService.getGeoDataByCityAndDateRange(city, startDateTime, endDateTime);
+        return ResponseEntity.ok(geoData);
+    }
+
     @Operation(summary = "Get smog data by school name and date")
     @GetMapping(value = "/school/{school}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,6 +86,20 @@ public class SmogDataController {
             date = LocalDate.now();
         }
         var geoData = smogDataService.getGeoDataBySchoolNameAndDate(school, date);
+        return ResponseEntity.ok(geoData);
+    }
+
+    @Operation(summary = "Get smog data by school name and date range")
+    @GetMapping(value = "/school/{school}/date-range",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<GeoDataByDateRangeDTO>> getGeoDataBySchoolNameAndDateRange(
+            @PathVariable String school,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        var geoData = smogDataService.getGeoDataBySchoolNameAndDateRange(school, startDateTime, endDateTime);
         return ResponseEntity.ok(geoData);
     }
 

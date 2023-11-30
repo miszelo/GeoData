@@ -8,6 +8,7 @@ import com.example.geodata.model.Place;
 import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.GeoDataRepository;
 import com.example.geodata.repository.PlaceRepository;
+import com.example.geodata.restapi.dto.GeoDataByDateRangeDTO;
 import com.example.geodata.restapi.dto.GeoDataDTO;
 import com.example.geodata.translators.EsaOseSmogDataResponseTranslator;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -97,6 +99,17 @@ public class SmogDataService {
         return mapGeoDataToGeoDataDTO(geoData);
     }
 
+    @Cacheable("geoDataByCityAndDateRange")
+    public List<GeoDataByDateRangeDTO> getGeoDataByCityAndDateRange(String city, LocalDateTime startDate, LocalDateTime endDate) {
+        return geoDataRepository.findAverageByCityAndTimestampBetween(city, startDate, endDate)
+                .orElseThrow();
+    }
+
+    @Cacheable("geoDataBySchoolNameAndDateRange")
+    public List<GeoDataByDateRangeDTO> getGeoDataBySchoolNameAndDateRange(String schoolName, LocalDateTime startDate, LocalDateTime endDate) {
+        return geoDataRepository.findAverageBySchoolNameAndTimestampBetween(schoolName, startDate, endDate)
+                .orElseThrow();
+    }
     private List<GeoData> getGeoDataList(EsaOseData esaOseData) {
         var coordinates = new HashSet<Coordinates>();
         var places = new HashSet<Place>();
@@ -114,6 +127,5 @@ public class SmogDataService {
     private Predicate<GeoData> filterRepeatedPlaces(Set<Place> places) {
         return smogData -> places.add(smogData.getPlace());
     }
-
 
 }
