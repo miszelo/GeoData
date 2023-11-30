@@ -1,8 +1,6 @@
 package com.example.geodata.restapi.controllers;
 
-import com.example.geodata.model.GeoData;
 import com.example.geodata.restapi.dto.GeoDataByDateRangeDTO;
-import com.example.geodata.restapi.dto.GeoDataByDateRangeDTOImpl;
 import com.example.geodata.restapi.dto.GeoDataDTO;
 import com.example.geodata.services.SmogDataService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,7 +65,7 @@ public class SmogDataController {
     @Operation(summary = "Get smog data by city and date range")
     @GetMapping(value = "/city/{city}/date-range",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<GeoDataByDateRangeDTOImpl>> getGeoDataByCityAndDateRange(
+    public ResponseEntity<List<GeoDataByDateRangeDTO>> getGeoDataByCityAndDateRange(
             @PathVariable String city,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
@@ -94,7 +92,7 @@ public class SmogDataController {
     @Operation(summary = "Get smog data by school name and date range")
     @GetMapping(value = "/school/{school}/date-range",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<GeoDataByDateRangeDTOImpl>> getGeoDataBySchoolNameAndDateRange(
+    public ResponseEntity<List<GeoDataByDateRangeDTO>> getGeoDataBySchoolNameAndDateRange(
             @PathVariable String school,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {

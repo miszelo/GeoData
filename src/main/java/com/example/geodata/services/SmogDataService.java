@@ -9,7 +9,6 @@ import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.GeoDataRepository;
 import com.example.geodata.repository.PlaceRepository;
 import com.example.geodata.restapi.dto.GeoDataByDateRangeDTO;
-import com.example.geodata.restapi.dto.GeoDataByDateRangeDTOImpl;
 import com.example.geodata.restapi.dto.GeoDataDTO;
 import com.example.geodata.translators.EsaOseSmogDataResponseTranslator;
 import org.springframework.cache.annotation.Cacheable;
@@ -101,13 +100,13 @@ public class SmogDataService {
     }
 
     @Cacheable("geoDataByCityAndDateRange")
-    public List<GeoDataByDateRangeDTOImpl> getGeoDataByCityAndDateRange(String city, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<GeoDataByDateRangeDTO> getGeoDataByCityAndDateRange(String city, LocalDateTime startDate, LocalDateTime endDate) {
         return geoDataRepository.findAverageByCityAndTimestampBetween(city, startDate, endDate)
                 .orElseThrow();
     }
 
     @Cacheable("geoDataBySchoolNameAndDateRange")
-    public List<GeoDataByDateRangeDTOImpl> getGeoDataBySchoolNameAndDateRange(String schoolName, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<GeoDataByDateRangeDTO> getGeoDataBySchoolNameAndDateRange(String schoolName, LocalDateTime startDate, LocalDateTime endDate) {
         return geoDataRepository.findAverageBySchoolNameAndTimestampBetween(schoolName, startDate, endDate)
                 .orElseThrow();
     }

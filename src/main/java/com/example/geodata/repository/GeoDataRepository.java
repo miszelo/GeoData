@@ -2,7 +2,6 @@ package com.example.geodata.repository;
 
 import com.example.geodata.model.GeoData;
 import com.example.geodata.restapi.dto.GeoDataByDateRangeDTO;
-import com.example.geodata.restapi.dto.GeoDataByDateRangeDTOImpl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -40,7 +39,7 @@ public interface GeoDataRepository extends JpaRepository<GeoData, Long> {
             " AND DATE(g.timestamp) = ?2")
     Optional<List<GeoData>> findAllByCityAndTimestamp(String city, Timestamp sqlTimestamp);
 
-    @Query("SELECT new com.example.geodata.restapi.dto.GeoDataByDateRangeDTOImpl(g.timestamp, " +
+    @Query("SELECT new com.example.geodata.restapi.dto.GeoDataByDateRangeDTO(g.timestamp, " +
             "p.name, p.street, p.postalCode, p.city.name, coord.longitude, coord.latitude, " +
             "AVG(g.humidity), AVG(g.pressure), AVG(g.temperature), AVG(g.pm10), AVG(g.pm25)) " +
             "FROM GeoData g " +
@@ -51,9 +50,9 @@ public interface GeoDataRepository extends JpaRepository<GeoData, Long> {
             "AND g.timestamp BETWEEN ?2 AND ?3 " +
             "GROUP BY p.placeId, DATE(g.timestamp) " +
             "ORDER BY g.timestamp, p.placeId")
-    Optional<List<GeoDataByDateRangeDTOImpl>> findAverageBySchoolNameAndTimestampBetween(String schoolName, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    Optional<List<GeoDataByDateRangeDTO>> findAverageBySchoolNameAndTimestampBetween(String schoolName, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
-    @Query("SELECT new com.example.geodata.restapi.dto.GeoDataByDateRangeDTOImpl(g.timestamp, " +
+    @Query("SELECT new com.example.geodata.restapi.dto.GeoDataByDateRangeDTO(g.timestamp, " +
             "p.name, p.street, p.postalCode, p.city.name, coord.longitude, coord.latitude, " +
             "AVG(g.humidity), AVG(g.pressure), AVG(g.temperature), AVG(g.pm10), AVG(g.pm25)) " +
             "FROM GeoData g " +
@@ -64,6 +63,6 @@ public interface GeoDataRepository extends JpaRepository<GeoData, Long> {
             "AND g.timestamp BETWEEN ?2 AND ?3 " +
             "GROUP BY p.placeId, DATE(g.timestamp) " +
             "ORDER BY g.timestamp, p.placeId")
-    Optional<List<GeoDataByDateRangeDTOImpl>> findAverageByCityAndTimestampBetween(String city, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    Optional<List<GeoDataByDateRangeDTO>> findAverageByCityAndTimestampBetween(String city, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
 }
