@@ -1,1 +1,1 @@
-UI parte [here](https://github.com/miszelo/GeoData-UI)
+UI part [here](https://github.com/miszelo/GeoData-UI)
